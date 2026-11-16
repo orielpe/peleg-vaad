@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ועד פלג</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --text:#1c2430; --muted:#5d6878; --line:#e3e6eb;
+  --accent:#2f6fdf; --accent-soft:#e6eefc; --good:#1f8a4c; --bad:#c43d3d; --warn:#b7791f;
+  --bar:#cfdcf5; --bar-fill:#2f6fdf; --bar-over:#c43d3d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161c; --card:#1b212a; --text:#e7ebf0; --muted:#9aa5b4; --line:#2c3440;
+    --accent:#7aa7f5; --accent-soft:#22324d; --good:#5cc98a; --bad:#f07a7a; --warn:#e3b35a;
+    --bar:#2a3a57; --bar-fill:#7aa7f5; --bar-over:#f07a7a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161c; --card:#1b212a; --text:#e7ebf0; --muted:#9aa5b4; --line:#2c3440;
+  --accent:#7aa7f5; --accent-soft:#22324d; --good:#5cc98a; --bad:#f07a7a; --warn:#e3b35a;
+  --bar:#2a3a57; --bar-fill:#7aa7f5; --bar-over:#f07a7a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Heebo,Arial,sans-serif;font-size:16px;line-height:1.5}
+a{color:var(--accent)}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding-top:12px;padding-bottom:12px}
+.brand{font-weight:700;font-size:20px;text-decoration:none;color:var(--text)}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+nav a{text-decoration:none;padding:6px 12px;border-radius:8px;color:var(--text);font-weight:500}
+nav a.on{background:var(--accent-soft);color:var(--accent)}
+h1{font-size:26px;margin:8px 0 4px}
+h2{font-size:19px;margin:28px 0 10px}
+.sub{color:var(--muted);margin:0 0 16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.chips a{text-decoration:none;border:1px solid var(--line);background:var(--card);padding:6px 14px;border-radius:999px;color:var(--text);font-weight:500}
+.chips a.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card .k{color:var(--muted);font-size:14px}
+.card .v{font-size:26px;font-weight:700;direction:ltr;text-align:right}
+.card .n{color:var(--muted);font-size:13px;margin-top:2px}
+.pos{color:var(--good)} .neg{color:var(--bad)} .warn{color:var(--warn)}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:500;background:var(--bg)}
+tr:last-child td{border-bottom:none}
+td.m{direction:ltr;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tfoot td{font-weight:700;background:var(--bg)}
+.note{display:block;color:var(--muted);font-size:13px}
+.bar{height:8px;background:var(--bar);border-radius:4px;margin-top:6px;overflow:hidden;max-width:220px}
+.bar i{display:block;height:100%;background:var(--bar-fill)}
+.bar i.over{background:var(--bar-over)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tag.wait{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
+.home-grid a{text-decoration:none;color:var(--text)}
+.home-grid .card h3{margin:0 0 4px;font-size:19px}
+.msg{padding:40px 0;text-align:center;color:var(--muted)}
+.foot{color:var(--muted);font-size:13px;margin:32px 0 8px}
+.callout{background:var(--card);border:1px solid var(--line);border-right:4px solid var(--warn);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:14px}
+@media (max-width:520px){h1{font-size:22px}.card .v{font-size:22px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="#/">ועד פלג</a>
+  <nav id="nav"></nav>
+</div></header>
+<main class="wrap" id="app"><div class="msg">טוען נתונים…</div></main>
+
+<script src="config.js"></script>
+<script src="calc.js"></script>
+<script>
+(function(){
+const app = document.getElementById('app');
+const nav = document.getElementById('nav');
+let DATA = null, updatedAt = null;
+
+const ils = (n) => {
+  const v = Math.round(n * 100) / 100;
+  const s = Math.abs(v).toLocaleString('he-IL', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+  return (v < 0 ? '-' : '') + '₪' + s;
+};
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls = (n) => n < 0 ? 'neg' : '';
+
+// ---- Load one tab from the Google Sheet (gviz JSONP, works for "anyone with the link" sheets)
+let cbN = 0;
+function loadTab(sheet){
+  return new Promise((resolve, reject) => {
+    const cb = '__gv' + (++cbN);
+    const s = document.createElement('script');
+    const t = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
+    function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
+    window[cb] = (resp) => {
+      cleanup();
+      if (resp.status === 'error') return reject(new Error(JSON.stringify(resp.errors)));
+      const cols = resp.table.cols.map((c) => ({label: (c.label || '').trim(), type: c.type}));
+      const rows = resp.table.rows.map((r) => {
+        const o = {};
+        cols.forEach((c, i) => {
+          const cell = r.c[i];
+          if (!cell) { o[c.label] = ''; return; }
+          if (c.type === 'date' || c.type === 'datetime') {
+            o[c.label] = cell.f || '';
+            const m = /Date\((\d+),(\d+),(\d+)/.exec(cell.v || '');
+            o['_sort_' + c.label] = m ? new Date(+m[1], +m[2], +m[3]).getTime() : 0;
+          } else {
+            o[c.label] = cell.v ?? '';
+          }
+        });
+        return o;
+      });
+      resolve(rows);
+    };
+    s.src = 'https://docs.google.com/spreadsheets/d/' + CONFIG.sheetId +
+      '/gviz/tq?headers=1&tqx=responseHandler:' + cb + '&sheet=' + encodeURIComponent(sheet) + '&_=' + Date.now();
+    s.onerror = () => { cleanup(); reject(new Error('network')); };
+    document.head.appendChild(s);
+  });
+}
+
+async function load(){
+  const [settings, classes, categories, expenses] = await Promise.all(
+    ['הגדרות', 'כיתות', 'סעיפים', 'הוצאות'].map(loadTab));
+  DATA = Calc.compute({settings, classes, categories, expenses});
+  updatedAt = new Date();
+}
+
+// ---- Views
+function cards(v, expectedLabel){
+  const exp = v.expectedCollected;
+  return `<div class="cards">
+    <div class="card"><div class="k">נגבה עד היום</div><div class="v">${ils(v.collected)}</div>
+      ${exp ? `<div class="n">${expectedLabel}: ${ils(exp)}</div>` : ''}</div>
+    <div class="card"><div class="k">הוצאות בפועל</div><div class="v">${ils(v.spent)}</div>
+      ${v.pendingReimburse ? `<div class="n warn">ממתין להחזר: ${ils(v.pendingReimburse)}</div>` : ''}</div>
+    <div class="card"><div class="k">יתרה בקופה</div><div class="v ${cls(v.balance)}">${ils(v.balance)}</div></div>
+    <div class="card"><div class="k">פנוי לתכנון</div><div class="v ${cls(v.unplanned)}">${ils(v.unplanned)}</div>
+      <div class="n">נגבה פחות סך התכנון (${ils(v.planned)})</div></div>
+  </div>`;
+}
+
+function planTable(v){
+  if (!v.rows.length) return '<div class="card">אין סעיפים מתוכננים.</div>';
+  const body = v.rows.map((r) => {
+    const pct = r.planned > 0 ? Math.round(r.actual / r.planned * 100) : (r.actual > 0 ? 100 : 0);
+    const over = r.actual > r.planned;
+    const label = r.planned > 0 ? `${pct}% נוצל` : (r.actual > 0 ? 'לא תוכנן' : 'טרם תוכנן');
+    return `<tr>
+      <td>${esc(r.name)}${r.notes ? `<span class="note">${esc(r.notes)}</span>` : ''}
+        <div class="bar"><i class="${over ? 'over' : ''}" style="width:${Math.min(pct,100)}%"></i></div>
+        <span class="note">${label}</span></td>
+      <td class="m">${ils(r.planned)}</td><td class="m">${ils(r.actual)}</td>
+      <td class="m ${cls(r.remaining)}">${ils(r.remaining)}</td></tr>`;
+  }).join('');
+  return `<div class="tbl"><table>
+    <thead><tr><th>סעיף</th><th>מתוכנן</th><th>בפועל</th><th>נותר בסעיף</th></tr></thead>
+    <tbody>${body}</tbody>
+    <tfoot><tr><td>סה״כ</td><td class="m">${ils(v.planned)}</td><td class="m">${ils(v.spent)}</td>
+      <td class="m ${cls(v.planned - v.spent)}">${ils(v.planned - v.spent)}</td></tr></tfoot>
+  </table></div>`;
+}
+
+function expTable(v){
+  if (!v.expenses.length) return '<div class="card">אין הוצאות עדיין.</div>';
+  const body = v.expenses.map((e) => {
+    let st = '—';
+    if (e.reimbursed) st = `<span class="tag">שולם${e.reimbursedDate ? ' ' + esc(e.reimbursedDate) : ''}</span>`;
+    else if (e.paidBy) st = '<span class="tag wait">ממתין להחזר</span>';
+    return `<tr><td>${esc(e.date)}</td><td>${esc(e.category)}</td>
+      <td>${esc(e.description)}${e.notes ? `<span class="note">${esc(e.notes)}</span>` : ''}</td>
+      <td class="m">${ils(e.amount)}</td><td>${esc(e.paidBy) || '—'}</td><td>${st}</td></tr>`;
+  }).join('');
+  return `<div class="tbl"><table>
+    <thead><tr><th>תאריך</th><th>סעיף</th><th>תיאור</th><th>סכום</th><th>מי שילם</th><th>החזר</th></tr></thead>
+    <tbody>${body}</tbody></table></div>`;
+}
+
+function viewHome(){
+  const L = DATA.leadership;
+  return `<h1>ועד ההורים ${esc(DATA.settings.year)}</h1>
+  <p class="sub">דוח שקוף של הגבייה, התכנון וההוצאות. מכל שקל שנגבה ${Math.round(DATA.settings.classPct*100)}% נשארים בכיתה ו-${Math.round(DATA.settings.leadPct*100)}% עוברים להנהגה.</p>
+  <div class="home-grid">
+    <a href="#/class/${encodeURIComponent(DATA.classes[0]?.name || '')}"><div class="card"><h3>תקציב כיתה</h3>
+      <div class="sub" style="margin:0">גבייה, תכנון והוצאות של כל כיתה</div></div></a>
+    <a href="#/leadership"><div class="card"><h3>תקציב הנהגה</h3>
+      <div class="sub" style="margin:0">נגבה ${ils(L.collected)} · הוצא ${ils(L.spent)}</div></div></a>
+    <a href="#/all"><div class="card"><h3>כל הכיתות</h3>
+      <div class="sub" style="margin:0">טבלת גבייה לפי כיתה</div></div></a>
+  </div>`;
+}
+
+function viewClass(name){
+  const v = DATA.classViews[name];
+  if (!v) return `<div class="msg">לא נמצאה כיתה ${esc(name)}</div>`;
+  const chips = DATA.classes.map((c) =>
+    `<a href="#/class/${encodeURIComponent(c.name)}" class="${c.name === name ? 'on' : ''}">${esc(c.name)}</a>`).join('');
+  const i = v.info;
+  return `<div class="chips">${chips}</div>
+  <h1>כיתה ${esc(name)}</h1>
+  <p class="sub">נגבו בכיתה ${ils(i.income)} מתוך ${ils(i.expected)} צפויים (${i.students} תלמידים × ${ils(i.perStudent)}).
+    ${Math.round(DATA.settings.classPct*100)}% מהם (${ils(v.collected)}) לתקציב הכיתה ו-${ils(i.leadShare)} להנהגה.</p>
+  ${cards(v, 'צפוי בסוף הגבייה')}
+  <h2>תכנון מול ביצוע</h2>${planTable(v)}
+  <h2>הוצאות</h2>${expTable(v)}`;
+}
+
+function viewLeadership(){
+  const v = DATA.leadership;
+  return `<h1>תקציב הנהגה</h1>
+  <p class="sub">ההנהגה מקבלת ${Math.round(DATA.settings.leadPct*100)}% מכל הגבייה בכל הכיתות (נגבה עד היום בכל הכיתות: ${ils(DATA.totalIncome)}).</p>
+  ${cards(v, 'צפוי בסוף הגבייה')}
+  ${v.planned > v.expectedCollected && v.expectedCollected ? `<div class="callout">סך התכנון (${ils(v.planned)}) גבוה מהסכום שצפוי להגיע להנהגה בסוף הגבייה (${ils(v.expectedCollected)}).</div>` : ''}
+  <h2>תכנון מול ביצוע</h2>${planTable(v)}
+  <h2>הוצאות</h2>${expTable(v)}`;
+}
+
+function viewAll(){
+  const rows = DATA.classes.map((c) => {
+    const v = DATA.classViews[c.name];
+    const missing = c.expected - c.income;
+    return `<tr><td><a href="#/class/${encodeURIComponent(c.name)}">${esc(c.name)}</a></td>
+      <td class="m">${c.students}</td><td class="m">${ils(c.income)}</td>
+      <td class="m ${missing > 0 ? 'warn' : ''}">${missing > 0 ? ils(missing) : '—'}</td>
+      <td class="m">${ils(c.classShare)}</td><td class="m">${ils(c.leadShare)}</td>
+      <td class="m">${ils(v.spent)}</td><td class="m ${cls(v.balance)}">${ils(v.balance)}</td></tr>`;
+  }).join('');
+  const t = (f) => DATA.classes.reduce((s, c) => s + f(c), 0);
+  const missingT = t((c) => Math.max(c.expected - c.income, 0));
+  return `<h1>כל הכיתות</h1>
+  <p class="sub">נגבו ${ils(DATA.totalIncome)} מתוך ${ils(DATA.totalExpected)} צפויים.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>כיתה</th><th>תלמידים</th><th>נגבה</th><th>חסר לגבייה</th><th>לכיתה</th><th>להנהגה</th><th>הוצאות כיתה</th><th>יתרת כיתה</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td>סה״כ</td><td class="m">${t((c) => c.students)}</td><td class="m">${ils(DATA.totalIncome)}</td>
+      <td class="m">${ils(missingT)}</td><td class="m">${ils(t((c) => c.classShare))}</td><td class="m">${ils(t((c) => c.leadShare))}</td>
+      <td class="m">${ils(t((c) => DATA.classViews[c.name].spent))}</td><td class="m">${ils(t((c) => DATA.classViews[c.name].balance))}</td></tr></tfoot>
+  </table></div>`;
+}
+
+function route(){
+  if (!DATA) return;
+  const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+  const [page, arg] = h.split('/');
+  let html, key = page || 'home';
+  if (page === 'class') html = viewClass(arg || DATA.classes[0]?.name);
+  else if (page === 'leadership') html = viewLeadership();
+  else if (page === 'all') html = viewAll();
+  else html = viewHome();
+  nav.innerHTML = [['home','#/','ראשי'],['class','#/class/' + encodeURIComponent(DATA.classes[0]?.name || ''),'כיתות'],['leadership','#/leadership','הנהגה'],['all','#/all','סיכום']]
+    .map(([k, href, t]) => `<a href="${href}" class="${k === key ? 'on' : ''}">${t}</a>`).join('');
+  app.innerHTML = html + `<p class="foot">הנתונים מתעדכנים ישירות מהגיליון. נטען ב-${updatedAt.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'})}.</p>`;
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('hashchange', route);
+load().then(route).catch((e) => {
+  console.error(e);
+  app.innerHTML = '<div class="msg">לא הצלחנו לטעון את הנתונים. נסו לרענן את הדף.</div>';
+});
+})();
+</script>
+</body>
+</html>
