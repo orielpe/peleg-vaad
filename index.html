@@ -78,7 +78,7 @@ tfoot td{font-weight:700;background:var(--bg)}
 .meter{margin-top:14px}
 .meter .bar{max-width:none;height:12px;border-radius:6px;margin:0}
 .meter .bar i{border-radius:6px}
-.meter .lbl{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);margin-top:6px}
+.meter .lbl{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;font-size:13px;color:var(--muted);margin-top:6px}
 .meter .lbl b{color:var(--text);font-weight:600}
 .lead-card{display:block;text-decoration:none;color:var(--text);margin-top:12px}
 .lead-card .card{padding:18px 20px}
@@ -227,11 +227,12 @@ function expTable(v){
     <tfoot><tr><td>סה״כ</td><td></td><td></td><td class="m">${ils(v.spent)}</td><td></td><td></td></tr></tfoot></table></div>`;
 }
 
-function meter(spent, collected){
+function meter(spent, collected, compact){
   const pct = collected > 0 ? Math.round(spent / collected * 100) : 0;
   const over = spent > collected;
+  const txt = compact ? `הוצא <b>${ils(spent)}</b> מתוך ${ils(collected)}` : `הוצא <b>${ils(spent)}</b> מתוך ${ils(collected)} שנגבו`;
   return `<div class="meter"><div class="bar"><i class="${over ? 'over' : ''}" style="width:${Math.min(pct,100)}%"></i></div>
-    <div class="lbl"><span>הוצא <b>${ils(spent)}</b> מתוך ${ils(collected)} שנגבו</span><span><b>${pct}%</b> נוצל</span></div></div>`;
+    <div class="lbl"><span>${txt}</span><span><b>${pct}%</b></span></div></div>`;
 }
 
 function viewHome(){
@@ -245,7 +246,7 @@ function viewHome(){
   const classCards = cv.map((v) => `<a href="#/class/${encodeURIComponent(v.name)}"><div class="card">
       <div class="cc-head"><h3>${esc(v.name)}</h3><span>${v.info.students} תלמידים</span></div>
       <div class="cc-bal ${cls(v.balance)}">${ils(v.balance)}<small>יתרה</small></div>
-      ${meter(v.spent, v.collected)}</div></a>`).join('');
+      ${meter(v.spent, v.collected, true)}</div></a>`).join('');
   return `<h1>ועד ההורים ${esc(DATA.settings.year)}</h1>
   <p class="sub">דוח שקוף של הגבייה, התכנון וההוצאות. מכל שקל שנגבה ${Math.round(DATA.settings.classPct*100)}% נשארים בכיתה ו-${Math.round(DATA.settings.leadPct*100)}% עוברים להנהגה.</p>
 
