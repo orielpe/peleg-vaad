@@ -76,6 +76,10 @@ tfoot td{font-weight:700;background:var(--bg)}
 .home-grid a{text-decoration:none;color:var(--text)}
 .home-grid .card h3{margin:0 0 4px;font-size:19px}
 .meter{margin-top:14px}
+.total-card{padding:18px 20px}
+.total-card .k{color:var(--muted);font-size:14px}
+.total-card .v{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.total-card .n{color:var(--muted);font-size:14px}
 .meter .bar{max-width:none;height:12px;border-radius:6px;margin:0}
 .meter .bar i{border-radius:6px}
 .meter .lbl{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;font-size:13px;color:var(--muted);margin-top:6px}
@@ -239,9 +243,7 @@ function viewHome(){
   const L = DATA.leadership;
   const cv = DATA.classes.map((c) => DATA.classViews[c.name]);
   const clsTotal = cv.reduce((a, v) => a + v.collected, 0);
-  const clsSpent = cv.reduce((a, v) => a + v.spent, 0);
   const students = DATA.classes.reduce((a, c) => a + c.students, 0);
-  const allSpent = clsSpent + L.spent;
   const clsPctOfAll = DATA.totalIncome > 0 ? clsTotal / DATA.totalIncome * 100 : 0;
   const classCards = cv.map((v) => `<a href="#/class/${encodeURIComponent(v.name)}"><div class="card">
       <div class="cc-head"><h3>${esc(v.name)}</h3><span>${v.info.students} תלמידים</span></div>
@@ -250,13 +252,9 @@ function viewHome(){
   return `<h1>ועד ההורים ${esc(DATA.settings.year)}</h1>
   <p class="sub">דוח שקוף של הגבייה, התכנון וההוצאות. מכל שקל שנגבה ${Math.round(DATA.settings.classPct*100)}% נשארים בכיתה ו-${Math.round(DATA.settings.leadPct*100)}% עוברים להנהגה.</p>
 
-  <div class="cards">
-    <div class="card"><div class="k">סך הגבייה</div><div class="v">${ils(DATA.totalIncome)}</div><div class="n">${DATA.classes.length} כיתות · ${students} תלמידים</div></div>
-    <div class="card"><div class="k">הוצא עד היום</div><div class="v">${ils(allSpent)}</div><div class="n">כיתות והנהגה יחד</div></div>
-    <div class="card"><div class="k">יתרה כוללת</div><div class="v ${cls(DATA.totalIncome - allSpent)}">${ils(DATA.totalIncome - allSpent)}</div></div>
-  </div>
-  <div class="card" style="margin-top:12px">
-    <div class="k" style="color:var(--muted);font-size:14px">איך הגבייה מתחלקת</div>
+  <div class="card total-card">
+    <div class="lead-head"><div><div class="k">סך הגבייה</div><div class="v">${ils(DATA.totalIncome)}</div></div>
+      <div class="n">${DATA.classes.length} כיתות · ${students} תלמידים</div></div>
     <div class="split"><i class="s-cls" style="width:${clsPctOfAll}%"></i><i class="s-lead" style="width:${100 - clsPctOfAll}%"></i></div>
     <div class="legend"><span><i style="background:var(--bar-fill)"></i>תקציבי הכיתות ${ils(clsTotal)}</span>
       <span><i style="background:var(--warn)"></i>תקציב ההנהגה ${ils(L.collected)}</span></div>
