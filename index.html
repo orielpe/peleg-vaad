@@ -212,7 +212,7 @@ function viewClass(name){
   const i = v.info;
   return `<div class="chips">${chips}</div>
   <h1>כיתה ${esc(name)}</h1>
-  <p class="sub">נגבו בכיתה ${ils(i.income)} מתוך ${ils(i.expected)} צפויים (${i.students} תלמידים × ${ils(i.perStudent)}).
+  <p class="sub">נגבו בכיתה ${ils(i.income)}.
     ${Math.round(DATA.settings.classPct*100)}% מהם (${ils(v.collected)}) לתקציב הכיתה ו-${ils(i.leadShare)} להנהגה.</p>
   ${cards(v)}
   <h2>תכנון מול ביצוע</h2>${planTable(v)}
@@ -241,7 +241,7 @@ function viewAll(){
   const t = (f) => DATA.classes.reduce((s, c) => s + f(c), 0);
   const missingT = t((c) => Math.max(c.expected - c.income, 0));
   return `<h1>כל הכיתות</h1>
-  <p class="sub">נגבו ${ils(DATA.totalIncome)} מתוך ${ils(DATA.totalExpected)} צפויים.</p>
+  <p class="sub">נגבו ${ils(DATA.totalIncome)}.</p>
   <div class="tbl"><table>
     <thead><tr><th>כיתה</th><th>תלמידים</th><th>נגבה</th><th>חסר לגבייה</th><th>לכיתה</th><th>להנהגה</th><th>הוצאות כיתה</th><th>יתרת כיתה</th></tr></thead>
     <tbody>${rows}</tbody>
