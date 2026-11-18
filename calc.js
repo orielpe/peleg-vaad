@@ -9,9 +9,9 @@
     return isNaN(n) ? 0 : n;
   }
   const round2 = (n) => Math.round(n * 100) / 100;
-  // Class share is rounded to the nearest half shekel; the leadership gets the rest,
-  // so the two parts always add up to exactly what was collected.
-  const roundHalf = (n) => Math.round(n * 2) / 2;
+  // Leadership share is rounded to the nearest whole shekel (what classes actually transfer);
+  // the class keeps the rest, so the two parts always add up to what was collected.
+  const leadPart = (amount, leadPct) => Math.round(round2(amount * leadPct));
 
   // settings: rows [{הגדרה, ערך}] -> object
   function readSettings(rows) {
@@ -37,10 +37,10 @@
         return {
           name: String(r['כיתה']).trim(),
           students, perStudent, income, expected,
-          classShare: roundHalf(income * settings.classPct),
-          leadShare: round2(income - roundHalf(income * settings.classPct)),
-          expectedClassShare: roundHalf(expected * settings.classPct),
-          expectedLeadShare: round2(expected - roundHalf(expected * settings.classPct)),
+          classShare: round2(income - leadPart(income, settings.leadPct)),
+          leadShare: leadPart(income, settings.leadPct),
+          expectedClassShare: round2(expected - leadPart(expected, settings.leadPct)),
+          expectedLeadShare: leadPart(expected, settings.leadPct),
         };
       });
   }
