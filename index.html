@@ -55,6 +55,12 @@ td.m{direction:ltr;text-align:right;white-space:nowrap;font-variant-numeric:tabu
 tfoot td{font-weight:700;background:var(--bg)}
 .note{display:block;color:var(--muted);font-size:13px}
 .bar{height:8px;background:var(--bar);border-radius:4px;margin-top:6px;overflow:hidden;max-width:220px}
+.plan{table-layout:fixed;min-width:680px}
+.plan td{vertical-align:middle}
+.plan .c-name{width:32%} .plan .c-m{width:14%} .plan .c-use{width:26%}
+.use{display:flex;align-items:center;gap:10px}
+.use .bar{flex:1;margin:0;max-width:none;height:10px}
+.use span{min-width:72px;font-size:13px;color:var(--muted);white-space:nowrap}
 .bar i{display:block;height:100%;background:var(--bar-fill)}
 .bar i.over{background:var(--bar-over)}
 .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
@@ -148,24 +154,27 @@ function cards(v, expectedLabel){
   </div>`;
 }
 
+function useCell(planned, actual){
+  const pct = planned > 0 ? Math.round(actual / planned * 100) : (actual > 0 ? 100 : 0);
+  const over = actual > planned;
+  const label = planned > 0 ? `${pct}% נוצל` : (actual > 0 ? 'לא תוכנן' : 'טרם תוכנן');
+  return `<div class="use"><div class="bar"><i class="${over ? 'over' : ''}" style="width:${Math.min(pct,100)}%"></i></div><span>${label}</span></div>`;
+}
+
 function planTable(v){
   if (!v.rows.length) return '<div class="card">אין סעיפים מתוכננים.</div>';
-  const body = v.rows.map((r) => {
-    const pct = r.planned > 0 ? Math.round(r.actual / r.planned * 100) : (r.actual > 0 ? 100 : 0);
-    const over = r.actual > r.planned;
-    const label = r.planned > 0 ? `${pct}% נוצל` : (r.actual > 0 ? 'לא תוכנן' : 'טרם תוכנן');
-    return `<tr>
-      <td>${esc(r.name)}${r.notes ? `<span class="note">${esc(r.notes)}</span>` : ''}
-        <div class="bar"><i class="${over ? 'over' : ''}" style="width:${Math.min(pct,100)}%"></i></div>
-        <span class="note">${label}</span></td>
+  const body = v.rows.map((r) => `<tr>
+      <td>${esc(r.name)}${r.notes ? `<span class="note">${esc(r.notes)}</span>` : ''}</td>
       <td class="m">${ils(r.planned)}</td><td class="m">${ils(r.actual)}</td>
-      <td class="m ${cls(r.remaining)}">${ils(r.remaining)}</td></tr>`;
-  }).join('');
-  return `<div class="tbl"><table>
-    <thead><tr><th>סעיף</th><th>מתוכנן</th><th>בפועל</th><th>נותר בסעיף</th></tr></thead>
+      <td class="m ${cls(r.remaining)}">${ils(r.remaining)}</td>
+      <td>${useCell(r.planned, r.actual)}</td></tr>`).join('');
+  return `<div class="tbl"><table class="plan">
+    <colgroup><col class="c-name"><col class="c-m"><col class="c-m"><col class="c-m"><col class="c-use"></colgroup>
+    <thead><tr><th>סעיף</th><th>מתוכנן</th><th>בפועל</th><th>נותר בסעיף</th><th>ניצול</th></tr></thead>
     <tbody>${body}</tbody>
     <tfoot><tr><td>סה״כ</td><td class="m">${ils(v.planned)}</td><td class="m">${ils(v.spent)}</td>
-      <td class="m ${cls(v.planned - v.spent)}">${ils(v.planned - v.spent)}</td></tr></tfoot>
+      <td class="m ${cls(v.planned - v.spent)}">${ils(v.planned - v.spent)}</td>
+      <td>${useCell(v.planned, v.spent)}</td></tr></tfoot>
   </table></div>`;
 }
 
