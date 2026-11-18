@@ -141,16 +141,13 @@ async function load(){
 }
 
 // ---- Views
-function cards(v, expectedLabel){
-  const exp = v.expectedCollected;
+function cards(v){
   return `<div class="cards">
-    <div class="card"><div class="k">נגבה עד היום</div><div class="v">${ils(v.collected)}</div>
-      ${exp ? `<div class="n">${expectedLabel}: ${ils(exp)}</div>` : ''}</div>
+    <div class="card"><div class="k">נגבה עד היום</div><div class="v">${ils(v.collected)}</div></div>
     <div class="card"><div class="k">הוצאות בפועל</div><div class="v">${ils(v.spent)}</div>
       ${v.pendingReimburse ? `<div class="n warn">ממתין להחזר: ${ils(v.pendingReimburse)}</div>` : ''}</div>
     <div class="card"><div class="k">יתרה בקופה</div><div class="v ${cls(v.balance)}">${ils(v.balance)}</div></div>
-    <div class="card"><div class="k">פנוי לתכנון</div><div class="v ${cls(v.unplanned)}">${ils(v.unplanned)}</div>
-      <div class="n">נגבה פחות סך התכנון (${ils(v.planned)})</div></div>
+    <div class="card"><div class="k">פנוי לתכנון</div><div class="v ${cls(v.unplanned)}">${ils(v.unplanned)}</div></div>
   </div>`;
 }
 
@@ -217,7 +214,7 @@ function viewClass(name){
   <h1>כיתה ${esc(name)}</h1>
   <p class="sub">נגבו בכיתה ${ils(i.income)} מתוך ${ils(i.expected)} צפויים (${i.students} תלמידים × ${ils(i.perStudent)}).
     ${Math.round(DATA.settings.classPct*100)}% מהם (${ils(v.collected)}) לתקציב הכיתה ו-${ils(i.leadShare)} להנהגה.</p>
-  ${cards(v, 'צפוי בסוף הגבייה')}
+  ${cards(v)}
   <h2>תכנון מול ביצוע</h2>${planTable(v)}
   <h2>הוצאות</h2>${expTable(v)}`;
 }
@@ -226,8 +223,7 @@ function viewLeadership(){
   const v = DATA.leadership;
   return `<h1>תקציב הנהגה</h1>
   <p class="sub">ההנהגה מקבלת ${Math.round(DATA.settings.leadPct*100)}% מכל הגבייה בכל הכיתות (נגבה עד היום בכל הכיתות: ${ils(DATA.totalIncome)}).</p>
-  ${cards(v, 'צפוי בסוף הגבייה')}
-  ${v.planned > v.expectedCollected && v.expectedCollected ? `<div class="callout">סך התכנון (${ils(v.planned)}) גבוה מהסכום שצפוי להגיע להנהגה בסוף הגבייה (${ils(v.expectedCollected)}).</div>` : ''}
+  ${cards(v)}
   <h2>תכנון מול ביצוע</h2>${planTable(v)}
   <h2>הוצאות</h2>${expTable(v)}`;
 }
