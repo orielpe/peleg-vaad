@@ -304,22 +304,19 @@ function viewLeadership(){
 function viewAll(){
   const rows = DATA.classes.map((c) => {
     const v = DATA.classViews[c.name];
-    const missing = c.expected - c.income;
     return `<tr><td><a href="#/class/${encodeURIComponent(c.name)}">${esc(c.name)}</a></td>
       <td class="m">${c.students}</td><td class="m">${ils(c.income)}</td>
-      <td class="m ${missing > 0 ? 'warn' : ''}">${missing > 0 ? ils(missing) : '—'}</td>
       <td class="m">${ils(c.classShare)}</td><td class="m">${ils(c.leadShare)}</td>
       <td class="m">${ils(v.spent)}</td><td class="m ${cls(v.balance)}">${ils(v.balance)}</td></tr>`;
   }).join('');
   const t = (f) => DATA.classes.reduce((s, c) => s + f(c), 0);
-  const missingT = t((c) => Math.max(c.expected - c.income, 0));
   return `<h1>כל הכיתות</h1>
   <p class="sub">נגבו ${ils(DATA.totalIncome)}.</p>
   <div class="tbl"><table>
-    <thead><tr><th>כיתה</th><th>תלמידים</th><th>נגבה</th><th>חסר לגבייה</th><th>לכיתה</th><th>להנהגה</th><th>הוצאות כיתה</th><th>יתרת כיתה</th></tr></thead>
+    <thead><tr><th>כיתה</th><th>תלמידים</th><th>נגבה</th><th>לכיתה</th><th>להנהגה</th><th>הוצאות כיתה</th><th>יתרת כיתה</th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr><td>סה״כ</td><td class="m">${t((c) => c.students)}</td><td class="m">${ils(DATA.totalIncome)}</td>
-      <td class="m">${ils(missingT)}</td><td class="m">${ils(t((c) => c.classShare))}</td><td class="m">${ils(t((c) => c.leadShare))}</td>
+      <td class="m">${ils(t((c) => c.classShare))}</td><td class="m">${ils(t((c) => c.leadShare))}</td>
       <td class="m">${ils(t((c) => DATA.classViews[c.name].spent))}</td><td class="m">${ils(t((c) => DATA.classViews[c.name].balance))}</td></tr></tfoot>
   </table></div>`;
 }
