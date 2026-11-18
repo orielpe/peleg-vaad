@@ -58,6 +58,13 @@ tfoot td{font-weight:700;background:var(--bg)}
 .plan{table-layout:fixed;min-width:680px}
 .plan td{vertical-align:middle}
 .plan .c-name{width:32%} .plan .c-m{width:14%} .plan .c-use{width:26%}
+.exp{table-layout:fixed;min-width:760px}
+.exp td{vertical-align:middle}
+.exp th{white-space:nowrap}
+.exp .c-date{width:13%} .exp .c-cat{width:27%} .exp .c-desc{width:23%} .exp .c-amt{width:12%} .exp .c-who{width:10%} .exp .c-st{width:15%}
+.exp td.d{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
+.exp td.cat{font-size:14px}
+.exp td.st .note{margin-top:4px}
 .use{display:flex;align-items:center;gap:10px}
 .use .bar{flex:1;margin:0;max-width:none;height:10px}
 .use span{min-width:72px;font-size:13px;color:var(--muted);white-space:nowrap}
@@ -179,15 +186,17 @@ function expTable(v){
   if (!v.expenses.length) return '<div class="card">אין הוצאות עדיין.</div>';
   const body = v.expenses.map((e) => {
     let st = '—';
-    if (e.reimbursed) st = `<span class="tag">שולם${e.reimbursedDate ? ' ' + esc(e.reimbursedDate) : ''}</span>`;
+    if (e.reimbursed) st = `<span class="tag">הוחזר</span>${e.reimbursedDate ? `<span class="note">${esc(e.reimbursedDate)}</span>` : ''}`;
     else if (e.paidBy) st = '<span class="tag wait">ממתין להחזר</span>';
-    return `<tr><td>${esc(e.date)}</td><td>${esc(e.category)}</td>
+    return `<tr><td class="d">${esc(e.date)}</td><td class="cat">${esc(e.category)}</td>
       <td>${esc(e.description)}${e.notes ? `<span class="note">${esc(e.notes)}</span>` : ''}</td>
-      <td class="m">${ils(e.amount)}</td><td>${esc(e.paidBy) || '—'}</td><td>${st}</td></tr>`;
+      <td class="m">${ils(e.amount)}</td><td>${esc(e.paidBy) || '—'}</td><td class="st">${st}</td></tr>`;
   }).join('');
-  return `<div class="tbl"><table>
-    <thead><tr><th>תאריך</th><th>סעיף</th><th>תיאור</th><th>סכום</th><th>מי שילם</th><th>החזר</th></tr></thead>
-    <tbody>${body}</tbody></table></div>`;
+  return `<div class="tbl"><table class="exp">
+    <colgroup><col class="c-date"><col class="c-cat"><col class="c-desc"><col class="c-amt"><col class="c-who"><col class="c-st"></colgroup>
+    <thead><tr><th>תאריך</th><th>סעיף</th><th>תיאור</th><th>סכום</th><th>שילם</th><th>החזר</th></tr></thead>
+    <tbody>${body}</tbody>
+    <tfoot><tr><td>סה״כ</td><td></td><td></td><td class="m">${ils(v.spent)}</td><td></td><td></td></tr></tfoot></table></div>`;
 }
 
 function viewHome(){
